@@ -1,92 +1,100 @@
-# 📈 Sales Forecasting with Machine Learning
+# 📈 Sales Forecasting with ML — REST API on GCP Cloud Run
 
 [![Python](https://img.shields.io/badge/Python-3776AB?style=flat&logo=python&logoColor=white)](https://python.org)
-[![Scikit-learn](https://img.shields.io/badge/Scikit--learn-F7931E?style=flat&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
 [![XGBoost](https://img.shields.io/badge/XGBoost-FF6600?style=flat)](https://xgboost.readthedocs.io)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![GCP](https://img.shields.io/badge/GCP_Cloud_Run-4285F4?style=flat&logo=googlecloud&logoColor=white)](https://cloud.google.com/run)
+[![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat&logo=docker&logoColor=white)](https://docker.com)
 
-> End-to-end ML pipeline comparing 5 regression models for monthly sales forecasting. Best model (XGBoost) achieved **RMSE of 4.2%** — an **18% improvement** over linear baseline. Published in IRJET 2024.
-
----
-
-## 📊 Results
-
-| Model | RMSE | MAE | R² |
-|---|---|---|---|
-| Linear Regression (baseline) | 5.1% | 4.3% | 0.81 |
-| Ridge Regression | 4.9% | 4.1% | 0.83 |
-| Random Forest | 4.6% | 3.8% | 0.86 |
-| Gradient Boosting | 4.4% | 3.6% | 0.88 |
-| **XGBoost (best)** | **4.2%** | **3.4%** | **0.90** |
-
-> XGBoost reduced RMSE by **18%** vs baseline through feature engineering and cross-validated hyperparameter tuning.
+> XGBoost model deployed as a **REST API on GCP Cloud Run** with full ETL pipeline for batch and real-time processing. Benchmarked 5 regression models — XGBoost achieved **RMSE 4.2%** on holdout set. Published in **IRJET 2024**.
 
 ---
 
-## 🔍 Approach
+## 📊 Model Comparison
 
-- Feature engineering: lag features, rolling means, seasonality, trend decomposition
-- Model comparison: 5 models, 5-fold cross validation
-- Tuning: GridSearchCV on 12 hyperparameters
-- Evaluation: MSE, RMSE, MAE on holdout test set
+| Model | RMSE | R² |
+|-------|------|----|
+| Linear Regression | 5.1% | 0.81 |
+| Ridge Regression | 4.9% | 0.83 |
+| Random Forest | 4.6% | 0.86 |
+| Gradient Boosting | 4.4% | 0.88 |
+| **XGBoost (best)** | **4.2%** | **0.90** |
+
+XGBoost reduced RMSE by **18%** vs baseline via feature engineering and cross-validated tuning.
 
 ---
 
-## 🚀 Quick Start
+## 🧱 Pipeline Architecture
+```
+Raw Sales Data → ETL Pipeline → Feature Engineering
+(lag features, rolling means, seasonality)
+→ XGBoost Training → REST API (GCP Cloud Run)
+→ Batch + Real-time Processing
+```
+
+---
+
+## 📡 API Usage
 ```bash
-git clone https://github.com/saiujwal-glitch/sales-forecasting-ml.git
+POST /forecast
+Content-Type: application/json
+
+{
+  "lag_1": 142000,
+  "lag_7": 138500,
+  "rolling_mean_30": 140200,
+  "month": 3,
+  "quarter": 1
+}
+```
+
+Response:
+```json
+{
+  "forecast": 142500.0,
+  "rmse": "4.2%",
+  "model": "XGBoost",
+  "processing": "real-time"
+}
+```
+
+---
+
+## 🚀 Run Locally
+```bash
+git clone https://github.com/saiujwalveerapalli/sales-forecasting-ml.git
 cd sales-forecasting-ml
 pip install -r requirements.txt
-python src/pipeline.py --data data/sales_data.csv --model xgboost
+uvicorn app:app --reload
+```
+
+## 🐳 Docker
+```bash
+docker build -t sales-api .
+docker run -p 8080:8080 sales-api
 ```
 
 ---
 
-## 📂 Project Structure
+## 📁 Project Structure
 ```
 sales-forecasting-ml/
-├── data/
-│   ├── raw/
-│   └── processed/
-├── notebooks/
-│   ├── 01_EDA.ipynb
-│   ├── 02_Feature_Engineering.ipynb
-│   ├── 03_Model_Comparison.ipynb
-│   └── 04_XGBoost_Tuning.ipynb
+├── app.py              # REST API
 ├── src/
-│   ├── features.py
-│   ├── models.py
-│   ├── evaluate.py
-│   └── pipeline.py
-├── models/
-│   └── xgboost_best.pkl
+│   ├── features.py     # Feature engineering
+│   └── etl.py          # ETL pipeline
 ├── requirements.txt
+├── Dockerfile
 └── README.md
-```
-
----
-
-## 📦 Requirements
-```
-xgboost>=1.7
-scikit-learn>=1.0
-pandas>=1.4
-numpy>=1.22
-matplotlib>=3.5
-seaborn>=0.11
-jupyter>=1.0
 ```
 
 ---
 
 ## 📚 Publication
 
-> **Sales Forecasting using Machine Learning** — IRJET, 2024
+**Sales Forecasting using Machine Learning** — IRJET, 2024
 
 ---
 
 ## 👤 Author
 
-**Sai Ujwal Veerapalli**
-- LinkedIn: [linkedin.com/in/saiujwalveerapalli](https://www.linkedin.com/in/saiujwalveerapalli)
-- Email: saiujwal@iastate.edu
+**Sai Ujwal Veerapalli** · [LinkedIn](https://linkedin.com/in/saiujwalveerapalli) · [Portfolio](https://saiujwalveerapalli.github.io)
